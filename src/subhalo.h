@@ -78,8 +78,8 @@ public:
   HBTxyz ComovingMostBoundPosition;//default pos of sub
   HBTxyz PhysicalMostBoundVelocity;
   
-//   HBTxyz ComovingPosition;
-//   HBTxyz PhysicalVelocity;
+  HBTxyz ComovingCorePosition, PhysicalCoreVelocity;
+  float ComovingCoreSigmaR, PhysicalCoreSigmaV;
   
   ParticleList_t Particles;
 #ifdef SAVE_BINDING_ENERGY
@@ -256,4 +256,24 @@ inline HBTInt GetCoreSize(HBTInt nbound)
   if(coresize>nbound) coresize=nbound;
   return coresize;
 }
+
+//for loading particle properties to calculate corestat
+struct ParticleProperty_t
+{
+// 	  HBTInt ParticleIndex;
+  HBTxyz ComovingPosition;
+  HBTxyz PhysicalVelocity;
+#ifndef DM_ONLY
+  HBTReal Mass;
+// #ifdef HAS_THERMAL_ENERGY
+// 	  HBTReal InternalEnergy;
+// #endif
+// 	  int Type;
+#endif
+};
+
+extern hid_t BuildHdfParticlePropertyType();
+#define NumPartCore 20
+extern void CoreStat(Subhalo_t &Subhalo, const ParticleProperty_t * Particles, HBTInt NumPart);
+
 #endif

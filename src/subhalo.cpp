@@ -337,6 +337,3 @@ HBTInt Subhalo_t::ParticleIdToIndex(const ParticleSnapshot_t& part_snap)
   return np_old-np_new;
 }
 #endif
-
-
-

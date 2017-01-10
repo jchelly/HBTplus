@@ -87,6 +87,7 @@ void SubhaloSnapshot_t::LoadSubDir(int snapshot_index, const SubReaderDepth_t de
   nhost++;
   MemberTable.Build(nhost, Subhalos, true); 
 }
+
 void SubhaloSnapshot_t::ReadFile(int iFile, const SubReaderDepth_t depth)
 {//Read iFile for current snapshot. 
   
@@ -166,6 +167,23 @@ void SubhaloSnapshot_t::ReadFile(int iFile, const SubReaderDepth_t depth)
     }
     ReclaimVlenData(dset, H5T_HBTIntArr, vl.data());
     H5Dclose(dset);
+  }
+  
+  //now read the particle properties for each subhalo
+  if(HBTConfig.SaveSubParticleProperties)
+  {
+	hid_t H5T_Particle=BuildHdfParticlePropertyType();
+	hid_t H5T_ParticleArr=H5Tvlen_create(H5T_Particle);
+	dset=H5Dopen2(file, "ParticleProperties", H5P_DEFAULT);
+	GetDatasetDims(dset, dims);
+	assert(dims[0]==nsubhalos);
+	H5Dread(dset, H5T_ParticleArr, H5S_ALL, H5S_ALL, H5P_DEFAULT, vl.data());
+	for(HBTInt i=0;i<nsubhalos;i++)
+	  CoreStat(NewSubhalos[i], static_cast<ParticleProperty_t *>(vl[i].p), vl[i].len);
+	ReclaimVlenData(dset, H5T_HBTIntArr, vl.data());
+	H5Dclose(dset);
+	H5Tclose(H5T_ParticleArr);
+	H5Tclose(H5T_Particle);
   }
   
 #ifdef SAVE_BINDING_ENERGY

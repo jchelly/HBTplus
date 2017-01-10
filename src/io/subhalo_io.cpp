@@ -210,6 +210,24 @@ void SubhaloSnapshot_t::LoadSingle(int snapshot_index, const SubReaderDepth_t de
     H5Dclose(dset);
   }
   
+  //now read the particle properties for each subhalo
+  if(HBTConfig.SaveSubParticleProperties)
+  {
+	hid_t H5T_Particle=BuildHdfParticlePropertyType();
+	hid_t H5T_ParticleArr=H5Tvlen_create(H5T_Particle);
+	dset=H5Dopen2(file, "ParticleProperties", H5P_DEFAULT);
+	GetDatasetDims(dset, dims);
+	assert(dims[0]==nsubhalos);
+	H5Dread(dset, H5T_ParticleArr, H5S_ALL, H5S_ALL, H5P_DEFAULT, vl.data());
+#pragma omp parallel for
+	for(HBTInt i=0;i<nsubhalos;i++)
+	  CoreStat(Subhalos[i], static_cast<ParticleProperty_t *>(vl[i].p), vl[i].len);
+	ReclaimVlenData(dset, H5T_HBTIntArr, vl.data());
+	H5Dclose(dset);
+	H5Tclose(H5T_ParticleArr);
+	H5Tclose(H5T_Particle);
+  }
+  
 #ifdef SAVE_BINDING_ENERGY
   {//read binding energies
 	dset=H5Dopen2(file, "BindingEnergies", H5P_DEFAULT);
@@ -284,7 +302,7 @@ void SubhaloSnapshot_t::Save()
   //now write the particle list for each subhalo
   if(HBTConfig.SaveSubParticleProperties)
   {
-	struct Particle_t
+	struct SaveParticle_t
 	{
 	  HBTInt ParticleIndex;
 	  HBTxyz ComovingPosition;
@@ -297,10 +315,10 @@ void SubhaloSnapshot_t::Save()
 	  int Type;
 #endif
 	};
-	hid_t H5T_Particle=H5Tcreate(H5T_COMPOUND, sizeof (Particle_t));
+	hid_t H5T_Particle=H5Tcreate(H5T_COMPOUND, sizeof (SaveParticle_t));
 	hsize_t dim_xyz=3;
 	hid_t H5T_HBTxyz=H5Tarray_create2(H5T_HBTReal, 1, &dim_xyz);
-	#define InsertMember(x,t) H5Tinsert(H5T_Particle, #x, HOFFSET(Particle_t, x), t)
+	#define InsertMember(x,t) H5Tinsert(H5T_Particle, #x, HOFFSET(SaveParticle_t, x), t)
 	InsertMember(ParticleIndex, H5T_HBTInt);
 	InsertMember(ComovingPosition, H5T_HBTxyz);
 	InsertMember(PhysicalVelocity, H5T_HBTxyz);
@@ -316,7 +334,7 @@ void SubhaloSnapshot_t::Save()
 	
 	hid_t H5T_ParticleArr=H5Tvlen_create(H5T_Particle);
 
-	vector <vector<Particle_t> > SubParticles(Subhalos.size());
+	vector <vector<SaveParticle_t> > SubParticles(Subhalos.size());
 	vl.resize(Subhalos.size());
 	for(HBTInt subid=0;subid<Subhalos.size();subid++)
 	{
@@ -402,3 +420,102 @@ void SubhaloSnapshot_t::Load(int snapshot_index, const SubReaderDepth_t depth)
     LoadSubDir(snapshot_index, depth);
   }
 }
+
+
+hid_t BuildHdfParticlePropertyType()
+{
+  hid_t H5T_Particle=H5Tcreate(H5T_COMPOUND, sizeof (ParticleProperty_t));
+	hsize_t dim_xyz=3;
+	hid_t H5T_HBTxyz=H5Tarray_create2(H5T_HBTReal, 1, &dim_xyz);
+	#define InsertMember(x,t) H5Tinsert(H5T_Particle, #x, HOFFSET(ParticleProperty_t, x), t)
+// 	InsertMember(ParticleIndex, H5T_HBTInt);
+	InsertMember(ComovingPosition, H5T_HBTxyz);
+	InsertMember(PhysicalVelocity, H5T_HBTxyz);
+#ifndef DM_ONLY
+	InsertMember(Mass, H5T_HBTReal);
+// 	#ifdef HAS_THERMAL_ENERGY
+// 	InsertMember(InternalEnergy, H5T_HBTReal);
+// 	#endif
+// 	InsertMember(Type, H5T_NATIVE_INT);
+#endif
+	#undef InsertMember
+	H5Tclose(H5T_HBTxyz);
+	return H5T_Particle;
+}
+#define NumPartCore 20
+void CoreStat(Subhalo_t &Subhalo, const ParticleProperty_t * Particles, HBTInt NumPart)
+/*return radial dispersion*/
+{
+  if(NumPart>NumPartCore) NumPart=NumPartCore;
+  
+  HBTInt i,j;
+  double sx[3],sx2[3], origin[3],msum;
+  double sv[3],sv2[3];
+  
+  if(0==NumPart) 
+  {
+    copyHBTxyz(Subhalo.ComovingCorePosition,SpecialConst::NullCoordinate);
+    copyHBTxyz(Subhalo.PhysicalCoreVelocity,SpecialConst::NullCoordinate);
+    Subhalo.ComovingCoreSigmaR=0.;
+    Subhalo.PhysicalCoreSigmaV=0.;
+    return;
+  }
+  if(1==NumPart) 
+  {
+    copyHBTxyz(Subhalo.ComovingCorePosition, Particles[0].ComovingPosition);
+    copyHBTxyz(Subhalo.PhysicalCoreVelocity, Particles[0].PhysicalVelocity);
+    Subhalo.ComovingCoreSigmaR=0.;
+    Subhalo.PhysicalCoreSigmaV=0.;
+    return;
+  }
+  
+  sx[0]=sx[1]=sx[2]=0.;
+  sx2[0]=sx2[1]=sx2[2]=0.;
+  sv[0]=sv[1]=sv[2]=0.;
+  sv2[0]=sv2[1]=sv2[2]=0.;
+  msum=0.;
+  if(HBTConfig.PeriodicBoundaryOn)
+    for(j=0;j<3;j++)
+      origin[j]=Particles[0].ComovingPosition[j];
+    
+    for(i=0;i<NumPart;i++)
+    {
+#ifdef DM_ONLY
+      HBTReal m=1.;
+#else
+      HBTReal m=Particles[i].Mass;
+#endif
+      msum+=m;
+      for(j=0;j<3;j++)
+      {
+	double dx;
+	if(HBTConfig.PeriodicBoundaryOn)
+	  dx=NEAREST(Particles[i].ComovingPosition[j]-origin[j]);
+	else
+	  dx=Particles[i].ComovingPosition[j];
+	sx[j]+=dx*m;
+	sx2[j]+=dx*dx*m;
+	double dv=Particles[i].PhysicalVelocity[j];
+	sv[j]+=dv*m;
+	sv2[j]+=dv*dv*m;
+      }
+    }
+    
+    for(j=0;j<3;j++)
+    {
+      sx[j]/=msum;
+      sx2[j]/=msum;
+      sx2[j]-=sx[j]*sx[j];
+      sv[j]/=msum;
+      sv2[j]/=msum;
+      sv2[j]-=sv[j]*sv[j];
+      if(HBTConfig.PeriodicBoundaryOn) 
+	Subhalo.ComovingCorePosition[j]=sx[j]+origin[j];
+      else
+	Subhalo.ComovingCorePosition[j]=sx[j];
+      Subhalo.PhysicalCoreVelocity[j]=sv[j];
+    }
+    Subhalo.ComovingCoreSigmaR=sqrt(sx2[0]+sx2[1]+sx2[2]);
+    Subhalo.PhysicalCoreSigmaV=sqrt(sv2[0]+sv2[1]+sv2[2]);
+}
+
