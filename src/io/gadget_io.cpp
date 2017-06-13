@@ -259,17 +259,18 @@ void GadgetReader_t::ReadGadgetFile(int iFile)
 #endif
   
   const auto NewParticles=Particles.begin()+OffsetOfParticleInFiles[iFile];
-  
+#define SKIPBLOCK {FortranBlock <float> block(fp, 0, 0, NeedByteSwap);}
 	if(RealTypeSize==4)
 	{
 	  ReadXYZBlock(float, ComovingPosition)
-	  ReadXYZBlock(float, PhysicalVelocity)
+// 	  ReadXYZBlock(float, PhysicalVelocity)
 	}
 	else
 	{
 	  ReadXYZBlock(double, ComovingPosition)
-	  ReadXYZBlock(double, PhysicalVelocity)
+// 	  ReadXYZBlock(double, PhysicalVelocity)
 	}
+	SKIPBLOCK
 
 	if(HBTConfig.PeriodicBoundaryOn)//regularize coord
 	{
@@ -279,10 +280,10 @@ void GadgetReader_t::ReadGadgetFile(int iFile)
 		  NewParticles[i].ComovingPosition[j]=position_modulus(NewParticles[i].ComovingPosition[j], boxsize);
 	}
   
-	HBTReal velocity_scale=sqrt(Header.ScaleFactor);
-	for(HBTInt i=0;i<n_read;i++)
-	  for(int j=0;j<3;j++)
-		NewParticles[i].PhysicalVelocity[j]*=velocity_scale;
+// 	HBTReal velocity_scale=sqrt(Header.ScaleFactor);
+// 	for(HBTInt i=0;i<n_read;i++)
+// 	  for(int j=0;j<3;j++)
+// 		NewParticles[i].PhysicalVelocity[j]*=velocity_scale;
 	
 	if(HBTConfig.SnapshotHasIdBlock)
 	{
@@ -292,22 +293,23 @@ void GadgetReader_t::ReadGadgetFile(int iFile)
 		exit(1);
 	  }
 	
-	  if(IntTypeSize==4)
-	  {
-		if(HBTConfig.SnapshotIdUnsigned)//unsigned int
-		  ReadScalarBlock(unsigned, Id)
-		else
-		  ReadScalarBlock(int, Id)
-	  }
-	  else
-		ReadScalarBlock(long, Id)
+// 	  if(IntTypeSize==4)
+// 	  {
+// 		if(HBTConfig.SnapshotIdUnsigned)//unsigned int
+// 		  ReadScalarBlock(unsigned, Id)
+// 		else
+// 		  ReadScalarBlock(int, Id)
+// 	  }
+// 	  else
+// 		ReadScalarBlock(long, Id)
+        SKIPBLOCK
 	}
-	else
-	{
-	  HBTInt id_now=OffsetOfParticleInFiles[iFile];
-	  for(HBTInt i=0;i<n_read;i++)
-		NewParticles[i].Id=id_now+i;
-	}
+// 	else
+// 	{
+// 	  HBTInt id_now=OffsetOfParticleInFiles[iFile];
+// 	  for(HBTInt i=0;i<n_read;i++)
+// 		NewParticles[i].Id=id_now+i;
+// 	}
 
 #define MassDataPresent(i) ((0==header.mass[i])&&(header.npart[i]))
   if(RealTypeSize==4)

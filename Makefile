@@ -1,4 +1,4 @@
-SRC_Jing=$(wildcard src/io/jing/*.cpp) $(wildcard src/io/jing/*.f90)
+#SRC_Jing=$(wildcard src/io/jing/*.cpp) $(wildcard src/io/jing/*.f90)
 SRC_COMM=$(wildcard src/*.cpp) $(wildcard src/io/*.cpp) $(SRC_Jing)
 OBJS_COMM=$(patsubst %.f90,%.f.o, $(SRC_COMM:%.cpp=%.o))
 

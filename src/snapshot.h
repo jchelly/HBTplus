@@ -23,9 +23,9 @@ struct RadVelMass_t
   
 struct Particle_t
 {
-  HBTInt Id;
+//   HBTInt Id;
   HBTxyz ComovingPosition;
-  HBTxyz PhysicalVelocity;
+//   HBTxyz PhysicalVelocity;
 #ifndef DM_ONLY
   HBTReal Mass;
 #ifdef HAS_THERMAL_ENERGY
@@ -192,7 +192,7 @@ inline HBTInt ParticleSnapshot_t::size() const
 }
 inline HBTInt ParticleSnapshot_t::GetMemberId(const HBTInt index) const
 {
-  return Particles[index].Id;
+  return index;
 }
 inline ParticleSnapshot_t::ParticleIndex_t ParticleSnapshot_t::GetParticleIndex(const ParticleId_t particle_id) const
 {
@@ -205,7 +205,7 @@ inline ParticleSnapshot_t::ParticleIndex_t ParticleSnapshot_t::GetNumberOfPartic
 }
 inline ParticleSnapshot_t::ParticleId_t ParticleSnapshot_t::GetParticleId(const ParticleIndex_t index) const
 {
-  return Particles[index].Id;
+  return index;
 }
 inline const HBTxyz& ParticleSnapshot_t::GetComovingPosition(const ParticleIndex_t index) const
 {
@@ -213,7 +213,7 @@ inline const HBTxyz& ParticleSnapshot_t::GetComovingPosition(const ParticleIndex
 }
 inline const HBTxyz& ParticleSnapshot_t::GetPhysicalVelocity(const ParticleIndex_t index) const
 {
-  return Particles[index].PhysicalVelocity;
+  return SpecialConst::NullCoordinate;
 }
 inline HBTReal ParticleSnapshot_t::GetParticleMass(const ParticleIndex_t index) const
 {
