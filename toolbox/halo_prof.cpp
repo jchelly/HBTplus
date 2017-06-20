@@ -19,7 +19,7 @@
 #define RMIN 1e-2 //only for deciding binwidth; not used to set the innermost bin edge.
 #define RMAX 20.
 #define NBIN 20
-//#define USE_LL //algorithm: whether to use linkedlist or geotree for spatial search.
+#define USE_LL //algorithm: whether to use linkedlist or geotree for spatial search.
 
 struct HaloSize_t
 {
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
  
 #ifdef USE_LL
   SnapshotPos_t PartPos(partsnap);
-  LinkedlistPara_t searcher(128, &PartPos, HBTConfig.BoxSize, HBTConfig.PeriodicBoundaryOn);
+  LinkedlistPara_t searcher(16, &PartPos, HBTConfig.BoxSize, HBTConfig.PeriodicBoundaryOn);
   cout<<"linked list compiled\n";
 #else
   GeoTree_t searcher;
