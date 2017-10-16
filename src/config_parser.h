@@ -18,7 +18,7 @@ namespace PhysicalConst
   extern HBTReal H0;
 }
 
-#define NumberOfCompulsaryConfigEntries 7
+#define NumberOfCompulsaryConfigEntries 8
 class Parameter_t
 {/*!remember to register members in BroadCast() and SetParameterValue() functions if you change them!*/
 public:
@@ -31,6 +31,8 @@ public:
   int MaxSnapshotIndex;
   HBTReal BoxSize; //to check the unit of snapshot according to the BoxSize in header
   HBTReal SofteningHalo;
+  HBTReal SofteningHaloMaxPhys;
+
   vector <bool> IsSet;
   
   /*optional*/

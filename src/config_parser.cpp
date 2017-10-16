@@ -23,6 +23,7 @@ void Parameter_t::SetParameterValue(const string &line)
   else TrySetPar(MaxSnapshotIndex,4)
   else TrySetPar(BoxSize,5)
   else TrySetPar(SofteningHalo,6)
+  else TrySetPar(SofteningHaloMaxPhys,7)
 #undef TrySetPar		
 #define TrySetPar(var) if(name==#var) ss>>var;
   else TrySetPar(SnapshotFormat)
@@ -195,6 +196,7 @@ void Parameter_t::BroadCast(MpiWorker_t &world, int root)
   _SyncAtom(MaxSnapshotIndex, MPI_INT);
   _SyncReal(BoxSize);
   _SyncReal(SofteningHalo);
+  _SyncReal(SofteningHaloMaxPhys);
   _SyncVecBool(IsSet);
   
   _SyncVec(SnapshotFormat, MPI_CHAR);
@@ -272,6 +274,7 @@ void Parameter_t::DumpParameters()
   DumpPar(MaxSnapshotIndex)
   DumpPar(BoxSize)
   DumpPar(SofteningHalo)
+  DumpPar(SofteningHaloMaxPhys)
   
   /*optional*/
   DumpPar(SnapshotFormat)
