@@ -57,6 +57,7 @@ namespace ParticleExchangeComp
 	return a.Id<b.Id;
   }
 
+  /*
   inline bool CompIdAndOrder(const OrderedParticle_t &a, const OrderedParticle_t &b)
   {
 	bool a_type=(a.Id!=SpecialConst::NullParticleId);
@@ -68,7 +69,8 @@ namespace ParticleExchangeComp
 	if(a_type&&b_type)
 	  return a.Order<b.Order; 
   }
-  
+  */
+
   template <class OrderedParticleList_T>
   void RestoreParticleOrder(OrderedParticleList_T &P)
   {
