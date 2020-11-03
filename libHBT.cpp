@@ -13,8 +13,10 @@ using namespace std;
 #include "src/mymath.h"
 #include "src/particle_exchanger.h"
 
+extern "C"
+{
 #include "libHBT.h"
-
+};
 
 // Data which must persist between HBT invocations
 static MpiWorker_t *world_ptr;

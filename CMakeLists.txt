@@ -149,10 +149,18 @@ set_target_properties(HBT-bin PROPERTIES OUTPUT_NAME HBT)
 # HBT library for on the fly calling from a simulation
 #
 if(HBT_LIBRARY)
+
+  # Library
   add_library(HBT-lib libHBT.cpp ${HBT_SRC})
   target_link_libraries(HBT-lib ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
   set_target_properties(HBT-lib PROPERTIES OUTPUT_NAME HBT)
+
+  # Test program
+  add_executable(test_libHBT test_libhbt.c)
+  target_link_libraries(test_libHBT HBT-lib)
+
 endif(HBT_LIBRARY)
+
 
 #
 # Hide some variables we usually don't need from the default view in the cmake GUI
