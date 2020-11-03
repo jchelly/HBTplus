@@ -92,7 +92,6 @@ endif(HBT_USE_GSL)
 # Headers are found automatically by cmake.
 #
 set(HBT_SRC 
-  HBT.cpp
   src/config_parser.cpp
   src/geometric_tree.cpp
   src/gravity_tree.cpp
@@ -137,12 +136,23 @@ hbt_option(HBT_INPUT_INT8              INPUT_INT8              "Enable to read 8
 hbt_option(HBT_INT8                    HBT_INT8                "Enable to use 8 byte integers"                   ON)
 hbt_option(HBT_REAL8                   HBT_REAL8               "Enable to use 8 byte reals"                      OFF)
 hbt_option(HBT_UNSIGNED_LONG_ID_OUTPUT UNSIGNED_LONG_ID_OUTPUT "Enable to output IDs as unsigned long"           ON)
+hbt_option(HBT_LIBRARY                 HBT_LIBRARY             "Enable libHBT for on the fly usage"              ON)
 
 #
 # HBT executable
 #
-add_executable(HBT ${HBT_SRC})
-target_link_libraries(HBT ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
+add_executable(HBT-bin HBT.cpp ${HBT_SRC})
+target_link_libraries(HBT-bin ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
+set_target_properties(HBT-bin PROPERTIES OUTPUT_NAME HBT)
+
+#
+# HBT library for on the fly calling from a simulation
+#
+if(HBT_LIBRARY)
+  add_library(HBT-lib libHBT.cpp ${HBT_SRC})
+  target_link_libraries(HBT-lib ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
+  set_target_properties(HBT-lib PROPERTIES OUTPUT_NAME HBT)
+endif(HBT_LIBRARY)
 
 #
 # Hide some variables we usually don't need from the default view in the cmake GUI
