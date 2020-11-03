@@ -59,7 +59,7 @@ void hbt_invoke(int first_snapnum, int this_snapnum)
 {
   MpiWorker_t &world = (*world_ptr);  
 #ifdef _OPENMP
-  omp_set_nested(0);
+  omp_set_max_active_levels(1);
   omp_set_num_threads(num_hbt_threads);
 #endif
 
