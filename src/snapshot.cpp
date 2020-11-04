@@ -345,3 +345,23 @@ void ParticleSnapshot_t::Clear()
   //   cout<<NumberOfParticles<<" particles cleared from snapshot "<<SnapshotIndex<<endl;
   NumberOfParticlesOnAllNodes=0;
 }
+
+#ifdef HBT_LIBRARY
+void ParticleSnapshot_t::Import(MpiWorker_t &world, int snapshot_index, bool fill_particle_hash,
+    void *data, size_t np, libhbt_callback_t callback)
+{
+  Clear();
+  SetSnapshotIndex(snapshot_index);
+  //Cosmology.Set(ScaleFactor, OmegaM0, OmegaLambda0);
+
+  Particles.resize(np);
+  /* I/O replacement goes here */
+
+  ExchangeParticles(world);
+  
+  if(fill_particle_hash)
+    FillParticleHash();
+  
+  if(world.rank()==0) cout<<NumberOfParticlesOnAllNodes<<" particles imported at Snapshot "<<snapshot_index<<"("<<SnapshotId<<")"<<endl;
+}
+#endif

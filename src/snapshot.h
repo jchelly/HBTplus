@@ -14,6 +14,10 @@
 #include "hash.h"
 #include "mpi_wrapper.h"
 
+#ifdef HBT_LIBRARY
+#include "libHBT.h"
+#endif
+
 struct Cosmology_t
 {
   HBTReal OmegaM0;
@@ -199,6 +203,10 @@ public:
   ParticleType_t GetParticleType(HBTInt index) const;
   
   void Load(MpiWorker_t &world, int snapshot_index, bool fill_particle_hash=true);
+#ifdef HBT_LIBRARY
+  void Import(MpiWorker_t &world, int snapshot_index, bool fill_particle_hash,
+              void *data, size_t np, libhbt_callback_t callback);
+#endif
   void Clear();
   
   void AveragePosition(HBTxyz & CoM, const HBTInt Particles[], HBTInt NumPart) const; 

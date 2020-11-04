@@ -143,6 +143,7 @@ hbt_option(HBT_LIBRARY                 HBT_LIBRARY             "Enable libHBT fo
 #
 add_executable(HBT-bin HBT.cpp ${HBT_SRC})
 target_link_libraries(HBT-bin ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
+target_include_directories(HBT-bin PRIVATE ${CMAKE_BINARY_DIR})
 set_target_properties(HBT-bin PROPERTIES OUTPUT_NAME HBT)
 
 #
