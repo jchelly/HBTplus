@@ -53,8 +53,9 @@ extern "C" void hbt_init(char *config_file, int num_threads)
 }
 
 
-extern "C" void hbt_invoke(int first_snapnum, int this_snapnum, void *data,
-                size_t np, libhbt_callback_t callback)
+extern "C" void hbt_invoke(int first_snapnum, int this_snapnum, double scalefactor,
+                           double omega_m0, double omega_lambda0,
+                           void *data, size_t np, libhbt_callback_t callback)
 {
   MpiWorker_t &world = (*world_ptr);  
 #ifdef _OPENMP
@@ -70,9 +71,11 @@ extern "C" void hbt_invoke(int first_snapnum, int this_snapnum, void *data,
     }
   SubhaloSnapshot_t &subsnap = (*subsnap_ptr);
 
-  // Load particles and halos for this output
+  // Import particles and halos for this output
   ParticleSnapshot_t partsnap;
-  partsnap.Load(world, this_snapnum);
+  partsnap.Import(world, this_snapnum, true,
+                  scalefactor, omega_m0, omega_lambda0,
+                  data, np, callback);
   subsnap.SetSnapshotIndex(this_snapnum);
   HaloSnapshot_t halosnap;
   halosnap.Load(world, this_snapnum);

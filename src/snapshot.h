@@ -205,6 +205,7 @@ public:
   void Load(MpiWorker_t &world, int snapshot_index, bool fill_particle_hash=true);
 #ifdef HBT_LIBRARY
   void Import(MpiWorker_t &world, int snapshot_index, bool fill_particle_hash,
+              double scalefactor, double omega_m0, double omega_lambda0,
               void *data, size_t np, libhbt_callback_t callback);
 #endif
   void Clear();

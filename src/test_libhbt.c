@@ -41,8 +41,10 @@ int main(int argc, char *argv[]) {
 
   hbt_init(config_file, num_threads);
 
+  /*
   for(int snapnum=first_snap; snapnum<=last_snap; snapnum+=1)
     hbt_invoke(first_snap, snapnum, NULL, 0, NULL);
+  */
 
   hbt_free();
 

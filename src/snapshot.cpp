@@ -348,14 +348,58 @@ void ParticleSnapshot_t::Clear()
 
 #ifdef HBT_LIBRARY
 void ParticleSnapshot_t::Import(MpiWorker_t &world, int snapshot_index, bool fill_particle_hash,
+    double scalefactor, double omega_m0, double omega_lambda0,
     void *data, size_t np, libhbt_callback_t callback)
 {
   Clear();
   SetSnapshotIndex(snapshot_index);
-  //Cosmology.Set(ScaleFactor, OmegaM0, OmegaLambda0);
-
+  Cosmology.Set(scalefactor, omega_m0, omega_lambda0);
   Particles.resize(np);
-  /* I/O replacement goes here */
+
+  // Loop over particles to import
+  for(size_t i=0; i<np; i++) {
+
+    // Fetch information about this particle
+    HBTInt  type;
+    HBTReal pos[3];
+    HBTReal vel[3];
+    HBTInt  id;
+    HBTReal mass;
+    HBTReal u;
+    (*callback)(data, i, &type, pos, vel, &id, &mass, &u);
+    
+    // Coordinates: box wrap if necessary
+    if(HBTConfig.PeriodicBoundaryOn)
+      for(int j=0;j<3;j++)
+        pos[j]=position_modulus(pos[j], HBTConfig.BoxSize);
+    for(int j=0;j<3;j++)
+      Particles[i].ComovingPosition[j] = pos[j];
+
+    // Velocity
+    for(int j=0;j<3;j++)
+      Particles[i].PhysicalVelocity[j]=vel[j];
+
+    // ID
+    Particles[i].Id=id;
+
+    // Mass
+    Particles[i].Mass=mass;
+
+#ifndef DM_ONLY
+#ifdef HAS_THERMAL_ENERGY
+    // Internal energy
+    Particles[i].InternalEnergy=u;
+#endif
+    // Type
+    ParticleType_t t=static_cast<ParticleType_t>(type);
+    Particles[i].Type=t;
+#else
+    if(type!=1) {
+      cout << "HBT compiled with DM_ONLY but have particle with type!=1" << endl;
+      MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+#endif
+  }
 
   ExchangeParticles(world);
   
