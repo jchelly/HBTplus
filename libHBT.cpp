@@ -83,6 +83,7 @@ void hbt_invoke(int first_snapnum, int this_snapnum)
   subsnap.UpdateParticles(world, partsnap);
   subsnap.AssignHosts(world, halosnap, partsnap);
   subsnap.PrepareCentrals(world, halosnap);
+  if(world.rank()==0) cout<<"unbinding...\n";
   subsnap.RefineParticles();
   subsnap.MergeSubhalos();
   subsnap.UpdateTracks(world, halosnap);	
