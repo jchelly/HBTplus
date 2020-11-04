@@ -13,11 +13,8 @@ using namespace std;
 #include "mymath.h"
 #include "particle_exchanger.h"
 
-// Include libHBT header here for two reasons:
-// - to declare the functions as extern C
-// - to check that prototypes are consistent with code
-extern "C"
-{
+// Include header to check consistency with code
+extern "C" {
 #include "libHBT.h"
 };
 
@@ -27,7 +24,7 @@ static int num_hbt_threads;
 static SubhaloSnapshot_t *subsnap_ptr;
 
 
-void hbt_init(char *config_file, int num_threads)
+extern "C" void hbt_init(char *config_file, int num_threads)
 {
   // MPI setup
   world_ptr = new MpiWorker_t(MPI_COMM_WORLD);
@@ -58,7 +55,8 @@ void hbt_init(char *config_file, int num_threads)
 }
 
 
-void hbt_invoke(int first_snapnum, int this_snapnum)
+extern "C" void hbt_invoke(int first_snapnum, int this_snapnum, void *data,
+                size_t np, libhbt_callback_t callback)
 {
   MpiWorker_t &world = (*world_ptr);  
 #ifdef _OPENMP
@@ -94,7 +92,7 @@ void hbt_invoke(int first_snapnum, int this_snapnum)
 }
 
 
-void hbt_free(void)
+extern "C" void hbt_free(void)
 {
   // Free HBT state which is stored between outputs
   delete world_ptr;

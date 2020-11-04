@@ -1,24 +1,34 @@
 #ifndef LIBHBT_H
 #define LIBHBT_H
 
+/* Settings passed in from cmake */
 #cmakedefine LIBHBT_DMONLY
 #cmakedefine LIBHBT_INT8
 #cmakedefine LIBHBT_REAL8
 
+/* HBT internal data type for real data */
 #ifdef LIBHBT_REAL8
 typedef double HBTReal;
 #else
 typedef float HBTReal;
 #endif
 
+/* HBT internal data type for integer data */
 #ifdef LIBHBT_INT8
 typedef long HBTInt;
 #else 
 typedef int HBTInt;
 #endif
 
+/* Prototype for callback function to fetch a particle from the caller */
+typedef void (*libhbt_callback_t)(void *data, size_t index,
+                                  HBTReal *pos, HBTReal *vel,
+                                  HBTInt *id, HBTReal *mass, HBTReal *u);
+
+/* libHBT functions */
 void hbt_init(char *config_file, int num_threads);
-void hbt_invoke(int first_snapnum, int this_snapnum);
+void hbt_invoke(int first_snapnum, int this_snapnum, void *data,
+                size_t np, libhbt_callback_t callback);
 void hbt_free(void);
 
 #endif
