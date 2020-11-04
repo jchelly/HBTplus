@@ -1,0 +1,24 @@
+#ifndef LIBHBT_H
+#define LIBHBT_H
+
+#cmakedefine LIBHBT_DMONLY
+#cmakedefine LIBHBT_INT8
+#cmakedefine LIBHBT_REAL8
+
+#ifdef LIBHBT_REAL8
+typedef double HBTReal;
+#else
+typedef float HBTReal;
+#endif
+
+#ifdef LIBHBT_INT8
+typedef long HBTInt;
+#else 
+typedef int HBTInt;
+#endif
+
+void hbt_init(char *config_file, int num_threads);
+void hbt_invoke(int first_snapnum, int this_snapnum);
+void hbt_free(void);
+
+#endif

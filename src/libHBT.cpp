@@ -13,6 +13,9 @@ using namespace std;
 #include "mymath.h"
 #include "particle_exchanger.h"
 
+// Include libHBT header here for two reasons:
+// - to declare the functions as extern C
+// - to check that prototypes are consistent with code
 extern "C"
 {
 #include "libHBT.h"

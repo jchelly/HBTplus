@@ -153,10 +153,18 @@ if(HBT_LIBRARY)
   # Library
   add_library(HBT-lib src/libHBT.cpp ${HBT_SRC})
   target_link_libraries(HBT-lib ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
+  target_include_directories(HBT-lib PRIVATE ${CMAKE_BINARY_DIR})
   set_target_properties(HBT-lib PROPERTIES OUTPUT_NAME HBT)
+
+  # Header file
+  set(LIBHBT_DMONLY ${HBT_DMONLY})
+  set(LIBHBT_INT8   ${HBT_INT8})
+  set(LIBHBT_REAL8  ${HBT_REAL8})
+  configure_file(src/libHBT.h.in libHBT.h)
 
   # Test program
   add_executable(test_libHBT src/test_libhbt.c)
+  target_include_directories(test_libHBT PRIVATE ${CMAKE_BINARY_DIR})
   target_link_libraries(test_libHBT HBT-lib)
 
 endif(HBT_LIBRARY)
