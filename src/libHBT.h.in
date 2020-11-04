@@ -25,10 +25,17 @@ typedef void (*libhbt_callback_t)(void *data, size_t index,
                                   HBTReal *pos, HBTReal *vel,
                                   HBTInt *id, HBTReal *mass, HBTReal *u);
 
+/* If included from C++, need to set C linkage on library functions */
+#ifdef __cplusplus
+#define EXTERN_C extern "C"
+#else
+#define EXTERN_C
+#endif
+
 /* libHBT functions */
-void hbt_init(char *config_file, int num_threads);
-void hbt_invoke(int first_snapnum, int this_snapnum, void *data,
-                size_t np, libhbt_callback_t callback);
-void hbt_free(void);
+EXTERN_C void hbt_init(char *config_file, int num_threads);
+EXTERN_C void hbt_invoke(int first_snapnum, int this_snapnum, void *data,
+                         size_t np, libhbt_callback_t callback);
+EXTERN_C void hbt_free(void);
 
 #endif

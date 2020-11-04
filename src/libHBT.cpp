@@ -14,9 +14,7 @@ using namespace std;
 #include "particle_exchanger.h"
 
 // Include header to check consistency with code
-extern "C" {
 #include "libHBT.h"
-};
 
 // Data which must persist between HBT invocations
 static MpiWorker_t *world_ptr;
