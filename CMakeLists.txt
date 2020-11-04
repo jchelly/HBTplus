@@ -151,12 +151,12 @@ set_target_properties(HBT-bin PROPERTIES OUTPUT_NAME HBT)
 if(HBT_LIBRARY)
 
   # Library
-  add_library(HBT-lib libHBT.cpp ${HBT_SRC})
+  add_library(HBT-lib src/libHBT.cpp ${HBT_SRC})
   target_link_libraries(HBT-lib ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
   set_target_properties(HBT-lib PROPERTIES OUTPUT_NAME HBT)
 
   # Test program
-  add_executable(test_libHBT test_libhbt.c)
+  add_executable(test_libHBT src/test_libhbt.c)
   target_link_libraries(test_libHBT HBT-lib)
 
 endif(HBT_LIBRARY)
