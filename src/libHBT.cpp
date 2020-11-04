@@ -4,14 +4,14 @@ using namespace std;
 #include <string>
 #include <omp.h>
 
-#include "src/mpi_wrapper.h"
-#include "src/datatypes.h"
-#include "src/config_parser.h"
-#include "src/snapshot.h"
-#include "src/halo.h"
-#include "src/subhalo.h"
-#include "src/mymath.h"
-#include "src/particle_exchanger.h"
+#include "mpi_wrapper.h"
+#include "datatypes.h"
+#include "config_parser.h"
+#include "snapshot.h"
+#include "halo.h"
+#include "subhalo.h"
+#include "mymath.h"
+#include "particle_exchanger.h"
 
 extern "C"
 {
