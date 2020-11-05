@@ -71,16 +71,18 @@ extern "C" void hbt_invoke(int snapnum, double scalefactor,
     }
   SubhaloSnapshot_t &subsnap = (*subsnap_ptr);
 
-  // Import particles and halos for this output
+  // Import particles for this output
   ParticleSnapshot_t partsnap;
   partsnap.Import(world, snapnum, true,
                   scalefactor, omega_m0, omega_lambda0,
                   data, np, callback);
   subsnap.SetSnapshotIndex(snapnum);
+
+  // Import halos for this output
   HaloSnapshot_t halosnap;
   halosnap.Load(world, snapnum);
 	
-  // Update subhalos to the current snapshot
+  // Update subhalos to the current output
   halosnap.UpdateParticles(world, partsnap);
   subsnap.UpdateParticles(world, partsnap);
   subsnap.AssignHosts(world, halosnap, partsnap);
