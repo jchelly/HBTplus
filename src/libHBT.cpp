@@ -53,7 +53,7 @@ extern "C" void hbt_init(char *config_file, int num_threads)
 }
 
 
-extern "C" void hbt_invoke(int first_snapnum, int this_snapnum, double scalefactor,
+extern "C" void hbt_invoke(int snapnum, double scalefactor,
                            double omega_m0, double omega_lambda0,
                            void *data, size_t np, libhbt_callback_t callback)
 {
@@ -67,18 +67,18 @@ extern "C" void hbt_invoke(int first_snapnum, int this_snapnum, double scalefact
   if(!subsnap_ptr)
     {
       subsnap_ptr = new SubhaloSnapshot_t;
-      (*subsnap_ptr).Load(world, this_snapnum-1, SubReaderDepth_t::SrcParticles);
+      (*subsnap_ptr).Load(world, snapnum-1, SubReaderDepth_t::SrcParticles);
     }
   SubhaloSnapshot_t &subsnap = (*subsnap_ptr);
 
   // Import particles and halos for this output
   ParticleSnapshot_t partsnap;
-  partsnap.Import(world, this_snapnum, true,
+  partsnap.Import(world, snapnum, true,
                   scalefactor, omega_m0, omega_lambda0,
                   data, np, callback);
-  subsnap.SetSnapshotIndex(this_snapnum);
+  subsnap.SetSnapshotIndex(snapnum);
   HaloSnapshot_t halosnap;
-  halosnap.Load(world, this_snapnum);
+  halosnap.Load(world, snapnum);
 	
   // Update subhalos to the current snapshot
   halosnap.UpdateParticles(world, partsnap);
