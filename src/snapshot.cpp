@@ -360,13 +360,14 @@ void ParticleSnapshot_t::Import(MpiWorker_t &world, int snapshot_index, bool fil
   for(size_t i=0; i<np; i++) {
 
     // Fetch information about this particle
+    HBTInt  fofid;
     HBTInt  type;
     HBTReal pos[3];
     HBTReal vel[3];
     HBTInt  id;
     HBTReal mass;
     HBTReal u;
-    (*callback)(data, i, &type, pos, vel, &id, &mass, &u);
+    (*callback)(data, i, &fofid, &type, pos, vel, &id, &mass, &u);
     
     // Coordinates: box wrap if necessary
     if(HBTConfig.PeriodicBoundaryOn)

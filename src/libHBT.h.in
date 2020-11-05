@@ -21,7 +21,7 @@ typedef int HBTInt;
 #endif
 
 /* Prototype for callback function to fetch a particle from the caller */
-typedef void (*libhbt_callback_t)(void *data, size_t index,
+typedef void (*libhbt_callback_t)(void *data, size_t index, HBTInt *fofid,
                                   HBTInt *type, HBTReal *pos, HBTReal *vel,
                                   HBTInt *id, HBTReal *mass, HBTReal *u);
 
