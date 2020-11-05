@@ -96,6 +96,7 @@ set(HBT_SRC
   src/geometric_tree.cpp
   src/gravity_tree.cpp
   src/halo.cpp
+  src/halo_import.cpp
   src/hdf_wrapper.cpp
   src/linkedlist_base.cpp
   src/linkedlist.cpp
@@ -103,6 +104,7 @@ set(HBT_SRC
   src/mymath.cpp
   src/particle_exchanger.cpp
   src/snapshot.cpp
+  src/snapshot_import.cpp
   src/snapshot_exchanger.cpp
   src/subhalo.cpp
   src/subhalo_merge.cpp

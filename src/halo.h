@@ -12,6 +12,10 @@
 #include "snapshot.h"
 #include "mpi_wrapper.h"
 
+#ifdef HBT_LIBRARY
+#include "libHBT.h"
+#endif
+
 class Halo_t
 {
 public:
@@ -58,6 +62,11 @@ public:
 	My_Type_free(&MPI_HBT_HaloId_t);
   }
   void Load(MpiWorker_t & world, int snapshot_index);
+#ifdef HBT_LIBRARY
+  void Import(MpiWorker_t &world, int snapshot_index, bool fill_particle_hash,
+              double scalefactor, double omega_m0, double omega_lambda0,
+              void *data, size_t np, libhbt_callback_t callback);
+#endif
   void Clear();
   void UpdateParticles(MpiWorker_t & world, const ParticleSnapshot_t & snapshot);
 //   void ParticleIndexToId();

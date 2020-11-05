@@ -80,7 +80,9 @@ extern "C" void hbt_invoke(int snapnum, double scalefactor,
 
   // Import halos for this output
   HaloSnapshot_t halosnap;
-  halosnap.Load(world, snapnum);
+  halosnap.Import(world, snapnum, true,
+                  scalefactor, omega_m0, omega_lambda0,
+                  data, np, callback);
 	
   // Update subhalos to the current output
   halosnap.UpdateParticles(world, partsnap);
