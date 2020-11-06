@@ -166,11 +166,6 @@ if(HBT_LIBRARY)
   set(LIBHBT_REAL8  ${HBT_REAL8})
   configure_file(src/libHBT.h.in libHBT.h)
 
-  # Test program
-  add_executable(test_libHBT src/test_libhbt.c)
-  target_include_directories(test_libHBT PRIVATE ${CMAKE_BINARY_DIR})
-  target_link_libraries(test_libHBT HBT-lib)
-
 endif(HBT_LIBRARY)
 
 
