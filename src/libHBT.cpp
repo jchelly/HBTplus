@@ -17,19 +17,31 @@ using namespace std;
 #include "libHBT.h"
 
 // Data which must persist between HBT invocations
-static MpiWorker_t *world_ptr;
-static int num_hbt_threads;
-static SubhaloSnapshot_t *subsnap_ptr;
+static struct libhbt_state_t {
+  MpiWorker_t *world_ptr;
+  int num_threads;
+  SubhaloSnapshot_t *subsnap_ptr;
+  double omega_m0, omega_lambda0;
+} libhbt_state;
 
 
-extern "C" void hbt_init(char *config_file, int num_threads)
+extern "C" void hbt_init(char *config_file, int num_threads,
+                         double omega_m0, double omega_lambda0)
 {
+  // Store cosmology
+  libhbt_state.omega_m0 = omega_m0;
+  libhbt_state.omega_lambda0 = omega_lambda0;
+
   // MPI setup
-  world_ptr = new MpiWorker_t(MPI_COMM_WORLD);
-  MpiWorker_t &world = (*world_ptr);
+  libhbt_state.world_ptr = new MpiWorker_t(MPI_COMM_WORLD);
+  MpiWorker_t &world = (*libhbt_state.world_ptr);
 
   // OpenMP configuration
-  num_hbt_threads = num_threads;
+  libhbt_state.num_threads = num_threads;
+#ifdef _OPENMP
+  omp_set_max_active_levels(1);
+  omp_set_num_threads(num_threads);
+#endif
 
   // Read input file and broadcast parameters
   if(0==world.rank())
@@ -49,38 +61,39 @@ extern "C" void hbt_init(char *config_file, int num_threads)
   HBTConfig.BroadCast(world, 0);
 
   // Initially we have no subhalo data in memory
-  subsnap_ptr = NULL;
+  libhbt_state.subsnap_ptr = NULL;
 }
 
 
 extern "C" void hbt_invoke(int snapnum, double scalefactor,
-                           double omega_m0, double omega_lambda0,
                            void *data, size_t np, libhbt_callback_t callback)
 {
-  MpiWorker_t &world = (*world_ptr);  
+  MpiWorker_t &world = (*libhbt_state.world_ptr);  
 #ifdef _OPENMP
   omp_set_max_active_levels(1);
-  omp_set_num_threads(num_hbt_threads);
+  omp_set_num_threads(libhbt_state.num_threads);
 #endif
 
   // Read in subhalos from previous snapshot if necessary
-  if(!subsnap_ptr)
+  if(!libhbt_state.subsnap_ptr)
     {
-      subsnap_ptr = new SubhaloSnapshot_t;
-      (*subsnap_ptr).Load(world, snapnum-1, SubReaderDepth_t::SrcParticles);
+      libhbt_state.subsnap_ptr = new SubhaloSnapshot_t;
+      (*libhbt_state.subsnap_ptr).Load(world, snapnum-1, SubReaderDepth_t::SrcParticles);
     }
-  SubhaloSnapshot_t &subsnap = (*subsnap_ptr);
+  SubhaloSnapshot_t &subsnap = *libhbt_state.subsnap_ptr;
 
   // Import particles for this output
   ParticleSnapshot_t partsnap;
-  partsnap.Import(world, snapnum, true, scalefactor, omega_m0,
-                  omega_lambda0, data, np, callback);
+  partsnap.Import(world, snapnum, true, scalefactor,
+                  libhbt_state.omega_m0, libhbt_state.omega_lambda0,
+                  data, np, callback);
   subsnap.SetSnapshotIndex(snapnum);
 
   // Import halos for this output
   HaloSnapshot_t halosnap;
-  halosnap.Import(world, snapnum, scalefactor, omega_m0,
-                  omega_lambda0, data, np, callback);
+  halosnap.Import(world, snapnum, scalefactor,
+                  libhbt_state.omega_m0, libhbt_state.omega_lambda0,
+                  data, np, callback);
 	
   // Update subhalos to the current output
   halosnap.UpdateParticles(world, partsnap);
@@ -98,6 +111,7 @@ extern "C" void hbt_invoke(int snapnum, double scalefactor,
 extern "C" void hbt_free(void)
 {
   // Free HBT state which is stored between outputs
-  delete world_ptr;
-  if(subsnap_ptr)delete subsnap_ptr;
+  delete libhbt_state.world_ptr;
+  libhbt_state.world_ptr = NULL;
+  if(libhbt_state.subsnap_ptr)delete libhbt_state.subsnap_ptr;
 }
