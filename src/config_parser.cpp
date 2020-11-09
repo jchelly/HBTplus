@@ -108,6 +108,19 @@ void Parameter_t::ParseConfigFile(const char * param_file)
   
   ReadSnapshotNameList();
 }
+
+void Parameter_t::SetUnits(HBTReal MassInMsunh_new, HBTReal LengthInMpch_new, HBTReal VelInKmS_new)
+{
+  // Override units specified in the config file
+  MassInMsunh  = MassInMsunh_new;
+  LengthInMpch = LengthInMpch_new;
+  VelInKmS     = VelInKmS_new;
+
+  // Update physical constants
+  PhysicalConst::G=43.0071*(MassInMsunh/1e10)/VelInKmS/VelInKmS/LengthInMpch;
+  PhysicalConst::H0=100.*(1./VelInKmS)/(1./LengthInMpch);  
+}
+
 void Parameter_t::ReadSnapshotNameList()
 {//to specify snapshotnamelist, create a file "snapshotlist.txt" under SubhaloPath, and list the filenames inside, one per line.
   string snaplist_filename=SubhaloPath+"/snapshotlist.txt";

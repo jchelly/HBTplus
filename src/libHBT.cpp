@@ -31,11 +31,6 @@ static struct libhbt_state_t {
   /* Cosmology */
   double omega_m0, omega_lambda0;
 
-  /* Units of the input data */
-  HBTReal MassInMsunh;
-  HBTReal LengthInMpch;
-  HBTReal VelInKmS;
-
   /* Group ID which indicates 'not in a group'*/
   HBTInt NullGroupId;
   
@@ -50,9 +45,6 @@ extern "C" void hbt_init(char *config_file, int num_threads,
   // Store cosmology etc
   libhbt_state.omega_m0 = omega_m0;
   libhbt_state.omega_lambda0 = omega_lambda0;
-  libhbt_state.MassInMsunh = MassInMsunh;
-  libhbt_state.LengthInMpch = LengthInMpch;
-  libhbt_state.VelInKmS = VelInKmS;
   libhbt_state.NullGroupId = NullGroupId;
 
   // MPI configuration
@@ -70,6 +62,7 @@ extern "C" void hbt_init(char *config_file, int num_threads,
   if(0==world.rank())
     {
       HBTConfig.ParseConfigFile(config_file);
+      HBTConfig.SetUnits(MassInMsunh, LengthInMpch, VelInKmS);
       mkdir(HBTConfig.SubhaloPath.c_str(), 0755);
       HBTConfig.DumpParameters();
     
