@@ -40,7 +40,8 @@ static struct libhbt_state_t {
 extern "C" void hbt_init(char *config_file, int num_threads,
                          double omega_m0, double omega_lambda0,
                          double MassInMsunh, double LengthInMpch,
-                         double VelInKmS, long long NullGroupId)
+                         double VelInKmS, long long NullGroupId,
+                         double SofteningHalo)
 {
   // Store cosmology etc
   libhbt_state.omega_m0 = omega_m0;
@@ -63,6 +64,7 @@ extern "C" void hbt_init(char *config_file, int num_threads,
     {
       HBTConfig.ParseConfigFile(config_file);
       HBTConfig.SetUnits(MassInMsunh, LengthInMpch, VelInKmS);
+      HBTConfig.SetSoftening(SofteningHalo);
       mkdir(HBTConfig.SubhaloPath.c_str(), 0755);
       HBTConfig.DumpParameters();
     

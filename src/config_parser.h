@@ -111,6 +111,7 @@ public:
   void ReadSnapshotNameList();
   void ParseConfigFile(const char * param_file);
   void SetUnits(HBTReal MassInMsunh, HBTReal LengthInMpch, HBTReal VelInKmS);
+  void SetSoftening(HBTReal SofteningHalo_new);
   void SetParameterValue(const string &line);
   void CheckUnsetParameters();
   void BroadCast(MpiWorker_t &world, int root);

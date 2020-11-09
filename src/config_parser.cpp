@@ -121,6 +121,12 @@ void Parameter_t::SetUnits(HBTReal MassInMsunh_new, HBTReal LengthInMpch_new, HB
   PhysicalConst::H0=100.*(1./VelInKmS)/(1./LengthInMpch);  
 }
 
+void Parameter_t::SetSoftening(HBTReal SofteningHalo_new)
+{
+  // Override softening set in the parameter file
+  SofteningHalo = SofteningHalo_new;
+}
+
 void Parameter_t::ReadSnapshotNameList()
 {//to specify snapshotnamelist, create a file "snapshotlist.txt" under SubhaloPath, and list the filenames inside, one per line.
   string snaplist_filename=SubhaloPath+"/snapshotlist.txt";
