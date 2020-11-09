@@ -34,7 +34,9 @@ typedef void (*libhbt_callback_t)(void *data, size_t index, HBTInt *fofid,
 
 /* libHBT functions */
 EXTERN_C void hbt_init(char *config_file, int num_threads,
-                       double omega_m0, double omega_lambda0);
+                       double omega_m0, double omega_lambda0,
+                       double MassInMsunh, double LengthInMpch,
+                       double VelInKmS, long long NullGroupId);
 EXTERN_C void hbt_invoke(int snapnum, double scalefactor,
                          void *data, size_t np, libhbt_callback_t callback);
 EXTERN_C void hbt_free(void);

@@ -18,21 +18,44 @@ using namespace std;
 
 // Data which must persist between HBT invocations
 static struct libhbt_state_t {
+
+  /* MPI communicator etc */
   MpiWorker_t *world_ptr;
+
+  /* OpenMP threads */
   int num_threads;
+
+  /* Subhalo data to keep between snapshots */
   SubhaloSnapshot_t *subsnap_ptr;
+
+  /* Cosmology */
   double omega_m0, omega_lambda0;
+
+  /* Units of the input data */
+  HBTReal MassInMsunh;
+  HBTReal LengthInMpch;
+  HBTReal VelInKmS;
+
+  /* Group ID which indicates 'not in a group'*/
+  HBTInt NullGroupId;
+  
 } libhbt_state;
 
 
 extern "C" void hbt_init(char *config_file, int num_threads,
-                         double omega_m0, double omega_lambda0)
+                         double omega_m0, double omega_lambda0,
+                         double MassInMsunh, double LengthInMpch,
+                         double VelInKmS, long long NullGroupId)
 {
-  // Store cosmology
+  // Store cosmology etc
   libhbt_state.omega_m0 = omega_m0;
   libhbt_state.omega_lambda0 = omega_lambda0;
+  libhbt_state.MassInMsunh = MassInMsunh;
+  libhbt_state.LengthInMpch = LengthInMpch;
+  libhbt_state.VelInKmS = VelInKmS;
+  libhbt_state.NullGroupId = NullGroupId;
 
-  // MPI setup
+  // MPI configuration
   libhbt_state.world_ptr = new MpiWorker_t(MPI_COMM_WORLD);
   MpiWorker_t &world = (*libhbt_state.world_ptr);
 
