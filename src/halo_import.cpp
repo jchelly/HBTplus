@@ -27,12 +27,9 @@ inline bool CompImportParticleHost(const ImportParticleHost_t &a, const ImportPa
 
 void HaloSnapshot_t::Import(MpiWorker_t &world, int snapshot_index,
                             double scalefactor, double omega_m0, double omega_lambda0,
-                            void *data, size_t np, libhbt_callback_t callback)
+                            HBTInt NullGroupId, void *data, size_t np, libhbt_callback_t callback)
 {
   SetSnapshotIndex(snapshot_index);
-
-  // TODO: pass in null group ID in case user changed it in Swift config
-  const int NullGroupId=(((long long) 1)<<31)-1;
 
   // Set up particle vector
   vector<ImportParticleHost_t> ParticleHosts;

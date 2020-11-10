@@ -111,7 +111,7 @@ extern "C" void hbt_invoke(int snapnum, double scalefactor,
   HaloSnapshot_t halosnap;
   halosnap.Import(world, snapnum, scalefactor,
                   libhbt_state.omega_m0, libhbt_state.omega_lambda0,
-                  data, np, callback);
+                  libhbt_state.NullGroupId, data, np, callback);
 	
   // Update subhalos to the current output
   halosnap.UpdateParticles(world, partsnap);
