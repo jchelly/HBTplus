@@ -25,6 +25,7 @@ void ParticleSnapshot_t::Import(MpiWorker_t &world, int snapshot_index, bool fil
   Particles.resize(np);
 
   // Loop over particles to import
+#pragma omp parallel for
   for(size_t i=0; i<np; i++) {
 
     // Fetch information about this particle
