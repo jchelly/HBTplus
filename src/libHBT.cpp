@@ -37,11 +37,11 @@ static struct libhbt_state_t {
 } libhbt_state;
 
 
-extern "C" void hbt_init(char *config_file, int num_threads,
-                         double omega_m0, double omega_lambda0,
-                         double MassInMsunh, double LengthInMpch,
-                         double VelInKmS, long long NullGroupId,
-                         double SofteningHalo)
+extern "C" void libhbt_init(char *config_file, int num_threads,
+                            double omega_m0, double omega_lambda0,
+                            double MassInMsunh, double LengthInMpch,
+                            double VelInKmS, long long NullGroupId,
+                            double SofteningHalo)
 {
   // Store cosmology etc
   libhbt_state.omega_m0 = omega_m0;
@@ -83,8 +83,8 @@ extern "C" void hbt_init(char *config_file, int num_threads,
 }
 
 
-extern "C" void hbt_invoke(int snapnum, double scalefactor,
-                           void *data, size_t np, libhbt_callback_t callback)
+extern "C" void libhbt_invoke_hbt(int snapnum, double scalefactor,
+                                  void *data, size_t np, libhbt_callback_t callback)
 {
   MpiWorker_t &world = (*libhbt_state.world_ptr);  
 #ifdef _OPENMP
@@ -126,7 +126,7 @@ extern "C" void hbt_invoke(int snapnum, double scalefactor,
 }
 
 
-extern "C" void hbt_free(void)
+extern "C" void libhbt_free(void)
 {
   // Free HBT state which is stored between outputs
   delete libhbt_state.world_ptr;
