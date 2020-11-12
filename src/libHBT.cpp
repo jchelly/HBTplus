@@ -40,8 +40,7 @@ static struct libhbt_state_t {
 extern "C" void libhbt_init(char *config_file, int num_threads,
                             double omega_m0, double omega_lambda0,
                             double MassInMsunh, double LengthInMpch,
-                            double VelInKmS, long long NullGroupId,
-                            double SofteningHalo)
+                            double VelInKmS, long long NullGroupId)
 {
   // Store cosmology etc
   libhbt_state.omega_m0 = omega_m0;
@@ -64,7 +63,6 @@ extern "C" void libhbt_init(char *config_file, int num_threads,
     {
       HBTConfig.ParseConfigFile(config_file);
       HBTConfig.SetUnits(MassInMsunh, LengthInMpch, VelInKmS);
-      HBTConfig.SetSoftening(SofteningHalo);
       mkdir(HBTConfig.SubhaloPath.c_str(), 0755);
       HBTConfig.DumpParameters();
     
@@ -84,7 +82,8 @@ extern "C" void libhbt_init(char *config_file, int num_threads,
 
 
 extern "C" void libhbt_invoke_hbt(int snapnum, double scalefactor,
-                                  void *data, size_t np, libhbt_callback_t callback)
+                                  void *data, size_t np,
+                                  libhbt_callback_t callback)
 {
   MpiWorker_t &world = (*libhbt_state.world_ptr);  
 #ifdef _OPENMP
