@@ -21,7 +21,7 @@ typedef int HBTInt;
 #endif
 
 /* Prototype for callback function to fetch a particle from the caller */
-typedef void (*libhbt_callback_t)(void *data, size_t index, HBTInt *fofid,
+typedef void (*libhbt_callback_t)(const void *data, const size_t index, HBTInt *fofid,
                                   HBTInt *type, HBTReal *pos, HBTReal *vel,
                                   HBTInt *id, HBTReal *mass, HBTReal *u);
 
@@ -33,12 +33,12 @@ typedef void (*libhbt_callback_t)(void *data, size_t index, HBTInt *fofid,
 #endif
 
 /* libHBT functions */
-EXTERN_C void libhbt_init(char *config_file, int num_threads,
-                          double omega_m0, double omega_lambda0,
-                          double MassInMsunh, double LengthInMpch,
-                          double VelInKmS, long long NullGroupId);
-EXTERN_C void libhbt_invoke_hbt(int snapnum, double scalefactor,
-                                void *data, size_t np, libhbt_callback_t callback);
+EXTERN_C void libhbt_init(const char *config_file, const int num_threads,
+                          const double omega_m0, const double omega_lambda0,
+                          const double MassInMsunh, const double LengthInMpch,
+                          const double VelInKmS, const long long NullGroupId);
+EXTERN_C void libhbt_invoke_hbt(const int snapnum, const double scalefactor,
+                                const void *data, const size_t np, libhbt_callback_t callback);
 EXTERN_C void libhbt_free(void);
 
 #endif

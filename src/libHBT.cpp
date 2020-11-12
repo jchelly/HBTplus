@@ -37,10 +37,10 @@ static struct libhbt_state_t {
 } libhbt_state;
 
 
-extern "C" void libhbt_init(char *config_file, int num_threads,
-                            double omega_m0, double omega_lambda0,
-                            double MassInMsunh, double LengthInMpch,
-                            double VelInKmS, long long NullGroupId)
+extern "C" void libhbt_init(const char *config_file, const int num_threads,
+                            const double omega_m0, const double omega_lambda0,
+                            const double MassInMsunh, const double LengthInMpch,
+                            const double VelInKmS, const long long NullGroupId)
 {
   // Store cosmology etc
   libhbt_state.omega_m0 = omega_m0;
@@ -81,8 +81,8 @@ extern "C" void libhbt_init(char *config_file, int num_threads,
 }
 
 
-extern "C" void libhbt_invoke_hbt(int snapnum, double scalefactor,
-                                  void *data, size_t np,
+extern "C" void libhbt_invoke_hbt(const int snapnum, const double scalefactor,
+                                  const void *data, const size_t np,
                                   libhbt_callback_t callback)
 {
   MpiWorker_t &world = (*libhbt_state.world_ptr);  
