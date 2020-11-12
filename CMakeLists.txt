@@ -159,6 +159,7 @@ if(HBT_LIBRARY)
   target_link_libraries(HBT-lib ${MPI_C_LIBRARIES} ${HDF5_C_LIBRARIES} ${HDF5_HL_LIBRARIES} ${GSL_LIBRARIES})
   target_include_directories(HBT-lib PRIVATE ${CMAKE_BINARY_DIR})
   set_target_properties(HBT-lib PROPERTIES OUTPUT_NAME HBT)
+  set_target_properties(HBT-lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
   # Header file
   set(LIBHBT_DMONLY ${HBT_DMONLY})
