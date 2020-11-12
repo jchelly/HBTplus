@@ -34,6 +34,9 @@ static struct libhbt_state_t {
   /* Group ID which indicates 'not in a group'*/
   HBTInt NullGroupId;
   
+  /* Previous snapshot number processed */
+  int prev_snapnum;
+
 } libhbt_state;
 
 
@@ -78,6 +81,9 @@ extern "C" void libhbt_init(const char *config_file, const int num_threads,
 
   // Initially we have no subhalo data in memory
   libhbt_state.subsnap_ptr = NULL;
+
+  // We have no previous snapnum initially
+  libhbt_state.prev_snapnum = -1;
 }
 
 
@@ -90,6 +96,14 @@ extern "C" void libhbt_invoke_hbt(const int snapnum, const double scalefactor,
   omp_set_max_active_levels(1);
   omp_set_num_threads(libhbt_state.num_threads);
 #endif
+
+  // Sanity check: must be called on consecutive sequence of snapnums
+  if(libhbt_state.prev_snapnum >= 0 && 
+     snapnum != libhbt_state.prev_snapnum+1) {
+    cout << "libHBT: Output numbers must be consecutive!" << endl;
+    MPI_Abort(MPI_COMM_WORLD, 1);
+  }
+  libhbt_state.prev_snapnum = snapnum;
 
   // Read in subhalos from previous snapshot if necessary
   if(!libhbt_state.subsnap_ptr)
