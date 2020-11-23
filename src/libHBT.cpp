@@ -42,8 +42,9 @@ static struct libhbt_state_t {
 
 extern "C" void libhbt_init(const char *config_file, const int num_threads,
                             const double omega_m0, const double omega_lambda0,
-                            const double MassInMsunh, const double LengthInMpch,
-                            const double VelInKmS, const long long NullGroupId)
+                            const double BoxSize, const double MassInMsunh,
+                            const double LengthInMpch, const double VelInKmS,
+                            const long long NullGroupId)
 {
   // Store cosmology etc
   libhbt_state.omega_m0 = omega_m0;
@@ -65,6 +66,17 @@ extern "C" void libhbt_init(const char *config_file, const int num_threads,
   if(0==world.rank())
     {
       HBTConfig.ParseConfigFile(config_file);
+      if(BoxSize!=HBTConfig.BoxSize)
+        printf("libHBT: Overriding BoxSize from config: new value is %16.8e\n", BoxSize);
+      HBTConfig.SetBoxSize(BoxSize);
+      if(MassInMsunh!=HBTConfig.MassInMsunh ||
+         LengthInMpch!=HBTConfig.LengthInMpch ||
+         VelInKmS!=HBTConfig.VelInKmS) {
+        printf("libHBT: Overriding units from config. New values:\n");
+        printf("libHBT:   MassInMsunh  = %16.8e\n", MassInMsunh);
+        printf("libHBT:   LengthInMpch = %16.8e\n", LengthInMpch);
+        printf("libHBT:   VelInKmS     = %16.8e\n", VelInKmS);
+      }
       HBTConfig.SetUnits(MassInMsunh, LengthInMpch, VelInKmS);
       mkdir(HBTConfig.SubhaloPath.c_str(), 0755);
       HBTConfig.DumpParameters();

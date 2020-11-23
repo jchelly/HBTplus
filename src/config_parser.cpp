@@ -109,7 +109,15 @@ void Parameter_t::ParseConfigFile(const char * param_file)
   ReadSnapshotNameList();
 }
 
-void Parameter_t::SetUnits(HBTReal MassInMsunh_new, HBTReal LengthInMpch_new, HBTReal VelInKmS_new)
+void Parameter_t::SetBoxSize(const HBTReal BoxSize_new) {
+  // Override box size from the config file
+  BoxSize=BoxSize_new;
+  BoxHalf=BoxSize/2.;  
+}
+
+void Parameter_t::SetUnits(const HBTReal MassInMsunh_new,
+                           const HBTReal LengthInMpch_new,
+                           const HBTReal VelInKmS_new)
 {
   // Override units specified in the config file
   MassInMsunh  = MassInMsunh_new;
@@ -121,7 +129,7 @@ void Parameter_t::SetUnits(HBTReal MassInMsunh_new, HBTReal LengthInMpch_new, HB
   PhysicalConst::H0=100.*(1./VelInKmS)/(1./LengthInMpch);  
 }
 
-void Parameter_t::SetSoftening(HBTReal SofteningHalo_new)
+void Parameter_t::SetSoftening(const HBTReal SofteningHalo_new)
 {
   // Override softening set in the parameter file
   SofteningHalo = SofteningHalo_new;
