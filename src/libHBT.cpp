@@ -25,6 +25,9 @@ static struct libhbt_state_t {
   /* OpenMP threads */
   int num_threads;
 
+  /* Whether to store subhalos in memory between snapshots */
+  int keep_subhalos;
+
   /* Subhalo data to keep between snapshots */
   SubhaloSnapshot_t *subsnap_ptr;
 
@@ -41,7 +44,7 @@ static struct libhbt_state_t {
 
 
 extern "C" void libhbt_init(const char *config_file, const int num_threads,
-                            const char *SubhaloPath,
+                            const char *SubhaloPath, const int keep_subhalos,
                             const double omega_m0, const double omega_lambda0,
                             const double BoxSize, const double MassInMsunh,
                             const double LengthInMpch, const double VelInKmS,
@@ -51,6 +54,7 @@ extern "C" void libhbt_init(const char *config_file, const int num_threads,
   libhbt_state.omega_m0 = omega_m0;
   libhbt_state.omega_lambda0 = omega_lambda0;
   libhbt_state.NullGroupId = NullGroupId;
+  libhbt_state.keep_subhalos = keep_subhalos;
 
   // MPI configuration
   libhbt_state.world_ptr = new MpiWorker_t(MPI_COMM_WORLD);
@@ -97,7 +101,7 @@ extern "C" void libhbt_init(const char *config_file, const int num_threads,
   HBTConfig.BroadCast(world, 0);
 
   // Initially we have no subhalo data in memory
-  libhbt_state.subsnap_ptr = NULL;
+  libhbt_state.subsnap_ptr = nullptr;
 
   // We have no previous snapnum initially
   libhbt_state.prev_snapnum = -1;
@@ -158,6 +162,15 @@ extern "C" void libhbt_invoke_hbt(const int snapnum, const double scalefactor,
   subsnap.MergeSubhalos();
   subsnap.UpdateTracks(world, halosnap);	
   subsnap.Save(world);
+
+  // Discard subhalo data if necessary
+  if(!libhbt_state.keep_subhalos) {
+    if(0==world.rank())
+      printf("libHBT: Discarding subhalos for output %d\n", snapnum);
+    delete libhbt_state.subsnap_ptr;
+    libhbt_state.subsnap_ptr = nullptr;
+  }
+
 }
 
 
@@ -165,6 +178,9 @@ extern "C" void libhbt_free(void)
 {
   // Free HBT state which is stored between outputs
   delete libhbt_state.world_ptr;
-  libhbt_state.world_ptr = NULL;
-  if(libhbt_state.subsnap_ptr)delete libhbt_state.subsnap_ptr;
+  libhbt_state.world_ptr = nullptr;
+  if(libhbt_state.subsnap_ptr){
+    delete libhbt_state.subsnap_ptr;
+    libhbt_state.subsnap_ptr = nullptr;
+  }
 }
