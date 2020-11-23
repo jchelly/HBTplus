@@ -109,6 +109,10 @@ void Parameter_t::ParseConfigFile(const char * param_file)
   ReadSnapshotNameList();
 }
 
+void Parameter_t::SetSubhaloPath(const string SubhaloPath_new) {
+  SubhaloPath = SubhaloPath_new;
+}
+
 void Parameter_t::SetBoxSize(const HBTReal BoxSize_new) {
   // Override box size from the config file
   BoxSize=BoxSize_new;

@@ -41,6 +41,7 @@ static struct libhbt_state_t {
 
 
 extern "C" void libhbt_init(const char *config_file, const int num_threads,
+                            const char *SubhaloPath,
                             const double omega_m0, const double omega_lambda0,
                             const double BoxSize, const double MassInMsunh,
                             const double LengthInMpch, const double VelInKmS,
@@ -66,6 +67,8 @@ extern "C" void libhbt_init(const char *config_file, const int num_threads,
   if(0==world.rank())
     {
       HBTConfig.ParseConfigFile(config_file);
+      HBTConfig.SetSubhaloPath(std::string(SubhaloPath));
+      printf("libHBT: Subhalo output path is: %s\n", SubhaloPath);
       if(BoxSize!=HBTConfig.BoxSize)
         printf("libHBT: Overriding BoxSize from config: new value is %16.8e\n", BoxSize);
       HBTConfig.SetBoxSize(BoxSize);
