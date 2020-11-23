@@ -81,6 +81,8 @@ extern "C" void libhbt_init(const char *config_file, const int num_threads,
         printf("libHBT:   VelInKmS     = %16.8e\n", VelInKmS);
       }
       HBTConfig.SetUnits(MassInMsunh, LengthInMpch, VelInKmS);
+      HBTConfig.SetDerivedParameters();
+      HBTConfig.GroupLoadedFullParticle=true;
       mkdir(HBTConfig.SubhaloPath.c_str(), 0755);
       HBTConfig.DumpParameters();
     
@@ -123,8 +125,13 @@ extern "C" void libhbt_invoke_hbt(const int snapnum, const double scalefactor,
   // Read in subhalos from previous snapshot if necessary
   if(!libhbt_state.subsnap_ptr)
     {
+      if(0==world.rank())
+        printf("libHBT: Reading subhalos for output %d\n", snapnum-1);
       libhbt_state.subsnap_ptr = new SubhaloSnapshot_t;
       (*libhbt_state.subsnap_ptr).Load(world, snapnum-1, SubReaderDepth_t::SrcParticles);
+    } else {
+      if(0==world.rank())
+        printf("libHBT: Already have subhalos for output %d\n", snapnum-1);
     }
   SubhaloSnapshot_t &subsnap = *libhbt_state.subsnap_ptr;
 

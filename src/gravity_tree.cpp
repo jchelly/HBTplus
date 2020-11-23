@@ -183,6 +183,7 @@ template class OctTree_t<GravityTreeCell_t>;//to wake up the functions for this 
 int main(int argc, char **argv)
 {
   HBTConfig.ParseConfigFile("../configs/AqA5.conf");
+  HBTConfig.SetDerivedParameters();
   HBTInt isnap=HBTConfig.MinSnapshotIndex;
   ParticleSnapshot_t snapshot;
   snapshot.Load(isnap);

@@ -110,6 +110,7 @@ public:
   }
   void ReadSnapshotNameList();
   void ParseConfigFile(const char * param_file);
+  void SetDerivedParameters();
   void SetSubhaloPath(const string SubhaloPath_new);
   void SetUnits(const HBTReal MassInMsunh_new, const HBTReal LengthInMpch_new, const HBTReal VelInKmS_new);
   void SetBoxSize(const HBTReal BoxSize_new);

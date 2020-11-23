@@ -92,6 +92,11 @@ void Parameter_t::ParseConfigFile(const char * param_file)
 	if(!line.empty()) SetParameterValue(line);
   }
   CheckUnsetParameters();
+
+}
+
+void Parameter_t::SetDerivedParameters()
+{
   PhysicalConst::G=43.0071*(MassInMsunh/1e10)/VelInKmS/VelInKmS/LengthInMpch;
   PhysicalConst::H0=100.*(1./VelInKmS)/(1./LengthInMpch);
   
@@ -110,13 +115,15 @@ void Parameter_t::ParseConfigFile(const char * param_file)
 }
 
 void Parameter_t::SetSubhaloPath(const string SubhaloPath_new) {
+  // Override subhalo path from the config file
+  // Must call before SetDerivedParameters
   SubhaloPath = SubhaloPath_new;
 }
 
 void Parameter_t::SetBoxSize(const HBTReal BoxSize_new) {
   // Override box size from the config file
+  // Must call before SetDerivedParameters
   BoxSize=BoxSize_new;
-  BoxHalf=BoxSize/2.;  
 }
 
 void Parameter_t::SetUnits(const HBTReal MassInMsunh_new,
@@ -124,21 +131,17 @@ void Parameter_t::SetUnits(const HBTReal MassInMsunh_new,
                            const HBTReal VelInKmS_new)
 {
   // Override units specified in the config file
+  // Must call before SetDerivedParameters
   MassInMsunh  = MassInMsunh_new;
   LengthInMpch = LengthInMpch_new;
   VelInKmS     = VelInKmS_new;
-
-  // Update physical constants
-  PhysicalConst::G=43.0071*(MassInMsunh/1e10)/VelInKmS/VelInKmS/LengthInMpch;
-  PhysicalConst::H0=100.*(1./VelInKmS)/(1./LengthInMpch);  
 }
 
 void Parameter_t::SetSoftening(const HBTReal SofteningHalo_new)
 {
   // Override softening set in the parameter file
+  // Must call before SetDerivedParameters
   SofteningHalo = SofteningHalo_new;
-  TreeNodeResolution=SofteningHalo*0.1;
-  TreeNodeResolutionHalf=TreeNodeResolution/2.;
 }
 
 void Parameter_t::ReadSnapshotNameList()
@@ -197,6 +200,7 @@ void ParseHBTParams(int argc, char **argv, Parameter_t &config, int &snapshot_st
 	exit(1);
   }
   config.ParseConfigFile(argv[1]);
+  config.SetDerivedParameters();
   if(2==argc)
   {
 	snapshot_start=config.MinSnapshotIndex;
