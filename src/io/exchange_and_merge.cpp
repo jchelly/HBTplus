@@ -12,6 +12,7 @@ using namespace std;
 
 #include "../mymath.h"
 #include "../halo.h"
+#include "../pairwise_alltoallv.h"
 
 struct HaloInfo_t
 {
@@ -141,7 +142,7 @@ static void DecideTargetProcessor(MpiWorker_t& world, vector< Halo_t >& Halos, v
   HaloInfoRecv.resize(nhalo_recv);
   MPI_Datatype MPI_HaloInfo_t;
   create_MPI_HaloInfo_t(MPI_HaloInfo_t);
-  MPI_Alltoallv(HaloInfoSend.data(), SendSizes.data(), SendOffsets.data(), MPI_HaloInfo_t, HaloInfoRecv.data(), RecvSizes.data(), RecvOffsets.data(), MPI_HaloInfo_t, world.Communicator);
+  Pairwise_Alltoallv(HaloInfoSend.data(), SendSizes.data(), SendOffsets.data(), MPI_HaloInfo_t, HaloInfoRecv.data(), RecvSizes.data(), RecvOffsets.data(), MPI_HaloInfo_t, world.Communicator);
   for(int i=0;i<nhalo_recv;i++)
     HaloInfoRecv[i].order=i;
   sort(HaloInfoRecv.begin(), HaloInfoRecv.end(), CompHaloInfo_Id);
@@ -170,7 +171,7 @@ static void DecideTargetProcessor(MpiWorker_t& world, vector< Halo_t >& Halos, v
   }
   sort(HaloInfoRecv.begin(), HaloInfoRecv.end(), CompHaloInfo_Order);
   //send back
-  MPI_Alltoallv(HaloInfoRecv.data(), RecvSizes.data(), RecvOffsets.data(), MPI_HaloInfo_t, HaloInfoSend.data(), SendSizes.data(), SendOffsets.data(), MPI_HaloInfo_t, world.Communicator);
+  Pairwise_Alltoallv(HaloInfoRecv.data(), RecvSizes.data(), RecvOffsets.data(), MPI_HaloInfo_t, HaloInfoSend.data(), SendSizes.data(), SendOffsets.data(), MPI_HaloInfo_t, world.Communicator);
   MPI_Type_free(&MPI_HaloInfo_t);
   
   TargetRank.resize(Halos.size());
@@ -230,10 +231,10 @@ static void ExchangeHalos(MpiWorker_t& world, vector <Halo_t>& InHalos, vector<H
 	HBTInt NumNewHalos=CompileOffsets(RecvHaloCounts, RecvHaloDisps);
 	OutHalos.resize(OutHalos.size()+NumNewHalos);
 	auto NewHalos=OutHalos.end()-NumNewHalos;
-	MPI_Alltoallv(InHalosSorted.data(), SendHaloCounts.data(), SendHaloDisps.data(), MPI_Halo_Shell_Type, &NewHalos[0], RecvHaloCounts.data(), RecvHaloDisps.data(), MPI_Halo_Shell_Type, world.Communicator);
+	Pairwise_Alltoallv(InHalosSorted.data(), SendHaloCounts.data(), SendHaloDisps.data(), MPI_Halo_Shell_Type, &NewHalos[0], RecvHaloCounts.data(), RecvHaloDisps.data(), MPI_Halo_Shell_Type, world.Communicator);
   //resize receivehalos
 	vector <HBTInt> OutHaloSizes(NumNewHalos);
-	MPI_Alltoallv(InHaloSizes.data(), SendHaloCounts.data(), SendHaloDisps.data(), MPI_HBT_INT, OutHaloSizes.data(), RecvHaloCounts.data(), RecvHaloDisps.data(), MPI_HBT_INT, world.Communicator);
+	Pairwise_Alltoallv(InHaloSizes.data(), SendHaloCounts.data(), SendHaloDisps.data(), MPI_HBT_INT, OutHaloSizes.data(), RecvHaloCounts.data(), RecvHaloDisps.data(), MPI_HBT_INT, world.Communicator);
 	for(HBTInt i=0;i<NumNewHalos;i++)
 	  NewHalos[i].Particles.resize(OutHaloSizes[i]);
 	
