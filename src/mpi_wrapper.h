@@ -10,6 +10,7 @@
 
 #include "datatypes.h"
 #include "mymath.h"
+#include "pairwise_alltoallv.h"
 
 class MpiWorker_t
 { 
@@ -168,7 +169,7 @@ void MyAllToAll(MpiWorker_t &world, vector <InParticleIterator_T> InParticleIter
 		}
 	  }
 	  //send
-	  MPI_Alltoallv(SendBuffer.data(), SendParticleCounts.data(), SendParticleDisps.data(), MPI_Particle_T, RecvBuffer.data(), RecvParticleCounts.data(), RecvParticleDisps.data(), MPI_Particle_T, world.Communicator);
+	  Pairwise_Alltoallv(SendBuffer.data(), SendParticleCounts.data(), SendParticleDisps.data(), MPI_Particle_T, RecvBuffer.data(), RecvParticleCounts.data(), RecvParticleDisps.data(), MPI_Particle_T, world.Communicator);
 	  //unpack
 	  for(int rank=0;rank<world.size();rank++)
 	  {
