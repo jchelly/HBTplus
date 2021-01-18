@@ -103,11 +103,13 @@ static double ReduceHaloPosition(vector <HaloInfo_t>::iterator it_begin, vector 
   }
   return msum;
 }
-static void ReduceHaloRank(vector <HaloInfo_t>::iterator it_begin, vector <HaloInfo_t>::iterator it_end, HBTxyz &step, vector <int> &dims)
+ static void ReduceHaloRank(vector <HaloInfo_t>::iterator it_begin, vector <HaloInfo_t>::iterator it_end, HBTxyz &step, vector <int> &dims,
+    MpiWorker_t& world)
 {
   HBTxyz x;
   ReduceHaloPosition(it_begin, it_end,x);
-  int rank=AssignCell(x, step, dims);
+  //int rank=AssignCell(x, step, dims);
+  int rank = rand() % world.size();
   for(auto it=it_begin;it!=it_end;++it)
     it->id=rank; //store destination rank in id.
 }
@@ -167,7 +169,7 @@ static void DecideTargetProcessor(MpiWorker_t& world, vector< Halo_t >& Halos, v
   {
     auto it_next=it;
     ++it_next;
-    ReduceHaloRank(HaloInfoRecv.begin()+*it, HaloInfoRecv.begin()+*it_next, step, dims);
+    ReduceHaloRank(HaloInfoRecv.begin()+*it, HaloInfoRecv.begin()+*it_next, step, dims, world);
   }
   sort(HaloInfoRecv.begin(), HaloInfoRecv.end(), CompHaloInfo_Order);
   //send back
