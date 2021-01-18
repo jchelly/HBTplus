@@ -54,6 +54,15 @@ int main(int argc, char **argv)
 	timer.Tick(world.Communicator);
 	ParticleSnapshot_t partsnap;
 	partsnap.Load(world, isnap);
+
+        // Report load balancing for partsnap
+        long long np_local = partsnap.Particles.size();
+        long long np_max, np_min;
+        MPI_Allreduce(&np_local, &np_max, 1, MPI_LONG_LONG, MPI_MAX, MPI_COMM_WORLD);
+        MPI_Allreduce(&np_local, &np_min, 1, MPI_LONG_LONG, MPI_MIN, MPI_COMM_WORLD);
+        if(world.rank()==0)
+          printf("ParticleSnapshot min Np=%lld, max Np=%lld\n", np_min, np_max);
+
 	subsnap.SetSnapshotIndex(isnap);
 	HaloSnapshot_t halosnap;
 	halosnap.Load(world, isnap);
