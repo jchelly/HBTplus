@@ -67,6 +67,13 @@ int main(int argc, char **argv)
 	HaloSnapshot_t halosnap;
 	halosnap.Load(world, isnap);
 	
+        // Report load balancing for halosnap
+        np_local = halosnap.TotNumberOfParticles;
+        MPI_Allreduce(&np_local, &np_max, 1, MPI_LONG_LONG, MPI_MAX, MPI_COMM_WORLD);
+        MPI_Allreduce(&np_local, &np_min, 1, MPI_LONG_LONG, MPI_MIN, MPI_COMM_WORLD);
+        if(world.rank()==0)
+          printf("HaloSnapshot min Np=%lld, max Np=%lld\n", np_min, np_max);
+
 	timer.Tick(world.Communicator);
 // 	cout<<"updating halo particles...\n";
 	halosnap.UpdateParticles(world, partsnap);
