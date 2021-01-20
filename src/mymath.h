@@ -16,6 +16,7 @@
 #include <mpi.h>
 
 #include "datatypes.h"
+#include "get_rss.h"
 
 #define VecDot(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
 #define VecNorm(x) VecDot(x,x)
@@ -80,7 +81,14 @@ public:
         int comm_rank;
         MPI_Comm_rank(comm, &comm_rank);
 	Tick();
-        if(comm_rank==0)cout << "  took " << GetSeconds() << "s" << endl;
+        long long peak_rss    = (long long) getPeakRSS();
+        long long peak_rss_min, peak_rss_max;
+        MPI_Allreduce(&peak_rss, &peak_rss_min, 1, MPI_LONG_LONG, MPI_MIN, comm);
+        MPI_Allreduce(&peak_rss, &peak_rss_max, 1, MPI_LONG_LONG, MPI_MAX, comm);
+        double peak_rss_min_gb = peak_rss_min / (1024.*1024.*1024.);
+        double peak_rss_max_gb = peak_rss_max / (1024.*1024.*1024.);
+
+        if(comm_rank==0)cout << "  took " << GetSeconds() << "s, PeakRSS (GB) = " << peak_rss_min_gb << " to " << peak_rss_max_gb << endl;
   }
   void Reset()
   {

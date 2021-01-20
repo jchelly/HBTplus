@@ -118,6 +118,7 @@ set(HBT_SRC
   src/io/subhalo_io.cpp
   src/io/exchange_and_merge.cpp
   src/pairwise_alltoallv.cpp
+  src/get_rss.cpp
   )
 
 #
