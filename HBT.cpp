@@ -75,14 +75,18 @@ int main(int argc, char **argv)
           printf("HaloSnapshot min Np=%lld, max Np=%lld\n", np_min, np_max);
 
 	timer.Tick(world.Communicator);
-// 	cout<<"updating halo particles...\n";
+ 	if(world.rank()==0)cout<<"updating halo particles...\n";
 	halosnap.UpdateParticles(world, partsnap);
 	timer.Tick(world.Communicator);
-// 	if(world.rank()==0) cout<<"updateing subsnap particles...\n";
+ 	if(world.rank()==0) cout<<"updating subsnap particles...\n";
 	subsnap.UpdateParticles(world, partsnap);
 	
 	timer.Tick(world.Communicator);
+ 	if(world.rank()==0) cout<<"assigning hosts...\n";
 	subsnap.AssignHosts(world, halosnap, partsnap);
+
+	timer.Tick(world.Communicator);
+ 	if(world.rank()==0) cout<<"preparing centrals...\n";
 	subsnap.PrepareCentrals(world, halosnap);
 	
 	timer.Tick(world.Communicator);
@@ -90,9 +94,11 @@ int main(int argc, char **argv)
 	subsnap.RefineParticles();
 	
 	timer.Tick(world.Communicator);
+ 	if(world.rank()==0) cout<<"merging subhalos...\n";
 	subsnap.MergeSubhalos();
 	
 	timer.Tick(world.Communicator);
+ 	if(world.rank()==0) cout<<"updating tracks hosts...\n";
 	subsnap.UpdateTracks(world, halosnap);
 	
 	timer.Tick(world.Communicator);

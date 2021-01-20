@@ -77,7 +77,10 @@ public:
   //synchronized tick. wait for all processes to tick together.
   {
 	MPI_Barrier(comm);
+        int comm_rank;
+        MPI_Comm_rank(comm, &comm_rank);
 	Tick();
+        if(comm_rank==0)cout << "  took " << GetSeconds() << "s" << endl;
   }
   void Reset()
   {
