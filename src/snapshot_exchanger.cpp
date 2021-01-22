@@ -161,7 +161,7 @@ void ParticleSnapshot_t::ExchangeParticles(MpiWorker_t &world)
   sort(Particles.begin(), Particles.end(), CompParticleId);
 
   MPI_Barrier(world.Communicator);
-
+  if(world.rank()==0)cout << "    First sort done, exchanging particles" << endl;
   
   vector <int> SendOffsets(world.size()+1), SendSizes(world.size(), 0);
   PartitionParticles(world, SendOffsets);
@@ -207,7 +207,7 @@ void ParticleSnapshot_t::ExchangeParticles(MpiWorker_t &world)
                      MPI_HBT_Particle, world.Communicator);
 
   MPI_Barrier(world.Communicator);
-
+  if(world.rank()==0)cout << "    Exchange done, doing second sort..." << endl;
 
   MPI_Type_free(&MPI_HBT_Particle);
   

@@ -49,6 +49,8 @@ void ParticleSnapshot_t::Load(MpiWorker_t & world, int snapshot_index, bool fill
 //   assert(Cosmology.ParticleMass>0);
 #endif
   
+  if(world.rank()==0) cout << "    Read snapshot files. Exchanging particles." << endl;
+  
   ExchangeParticles(world);
   
   if(fill_particle_hash)

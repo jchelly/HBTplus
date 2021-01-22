@@ -467,7 +467,8 @@ void SwiftSimReader_t::LoadSnapshot(MpiWorker_t &world, int snapshotId, vector <
     np=accumulate(np_file.begin()+nfiles_skip, np_file.begin()+nfiles_end, np);
     Particles.resize(np);
   }
-  
+  //cout << "Task " << world.rank() << " number of files = " << nfiles_end-nfiles_skip << endl;
+
   for(int i=0, ireader=0;i<world.size();i++, ireader++)
   {
 	if(ireader==HBTConfig.MaxConcurrentIO) 
@@ -485,7 +486,6 @@ void SwiftSimReader_t::LoadSnapshot(MpiWorker_t &world, int snapshotId, vector <
   }
 
   MPI_Barrier(world.Communicator);
-
 }
 
 inline bool CompParticleHost(const SwiftParticleHost_t &a, const SwiftParticleHost_t &b)
