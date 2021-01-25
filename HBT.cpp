@@ -62,6 +62,7 @@ int main(int argc, char **argv)
         MPI_Allreduce(&np_local, &np_min, 1, MPI_LONG_LONG, MPI_MIN, MPI_COMM_WORLD);
         if(world.rank()==0)
           printf("ParticleSnapshot min Np=%lld, max Np=%lld\n", np_min, np_max);
+	timer.Tick(world.Communicator);
 
 	subsnap.SetSnapshotIndex(isnap);
 	HaloSnapshot_t halosnap;
@@ -81,6 +82,9 @@ int main(int argc, char **argv)
  	if(world.rank()==0) cout<<"updating subsnap particles...\n";
 	subsnap.UpdateParticles(world, partsnap);
 	
+        // Don't need the particle data after this point, so save memory
+        partsnap.ClearParticles();
+
 	timer.Tick(world.Communicator);
  	if(world.rank()==0) cout<<"assigning hosts...\n";
 	subsnap.AssignHosts(world, halosnap, partsnap);
